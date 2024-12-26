@@ -76,14 +76,25 @@ def linear(
     x: torch.Tensor, weight: torch.Tensor, bias: Optional[torch.Tensor] = None
 ) -> torch.Tensor:
     if weight.element_size() > 1:
+        # Convert weight to same dtype as input
+        weight = weight.to(x.dtype)
+        if bias is not None:
+            bias = bias.to(x.dtype)
         return F.linear(x, weight, bias)
     elif gemm_impl == "bf16":
         weight = weight_dequant(weight, weight.scale)
+        # Convert dequantized weight to same dtype as input
+        weight = weight.to(x.dtype)
+        if bias is not None:
+            bias = bias.to(x.dtype)
         return F.linear(x, weight, bias)
     else:
         x, scale = act_quant(x, block_size)
         y = fp8_gemm(x, scale, weight, weight.scale)
+        # Convert output to same dtype as input
+        y = y.to(x.dtype)
         if bias is not None:
+            bias = bias.to(y.dtype)
             y += bias
         return y
 
