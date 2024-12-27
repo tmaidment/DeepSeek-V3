@@ -67,7 +67,7 @@ def main(
     max_new_tokens: int = 100,
     temperature: float = 1.0,
 ) -> None:
-    world_size = int(os.getenv("WORLD_SIZE", "1"))
+    world_size = int(os.getenv("WORLD_SIZE", "16"))
     rank = int(os.getenv("RANK", "0"))
     local_rank = int(os.getenv("LOCAL_RANK", "0"))
     if world_size > 1:
